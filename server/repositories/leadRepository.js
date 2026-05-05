@@ -108,7 +108,7 @@ export function createLeadRepository(db) {
       const auditRows = db.prepare(`
         SELECT * FROM audit_events
         WHERE lead_id = ?
-        ORDER BY created_at ASC, id ASC
+        ORDER BY created_at ASC, rowid ASC
       `).all(leadId);
 
       return {

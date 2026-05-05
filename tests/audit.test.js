@@ -60,7 +60,7 @@ describe("audit repository", () => {
     });
   });
 
-  it("orders lead audit events by timestamp and id for stable timelines", () => {
+  it("orders lead audit events by timestamp and insertion order for stable timelines", () => {
     const db = createTestDatabase();
     const repos = createRepositories(db);
     const client = repos.clients.create({ name: "Demo Medical", slug: "medical-practice" });
@@ -75,7 +75,7 @@ describe("audit repository", () => {
         ('audit_a', @leadId, @clientId, 'first_same_time', 'test', '{}', '2026-05-05T20:00:00.000Z')
     `).run({ leadId: lead.id, clientId: client.id });
 
-    expect(repos.audit.listForLead(lead.id).map((event) => event.id)).toEqual(["audit_a", "audit_b"]);
-    expect(repos.leads.getLeadDetail(lead.id).auditEvents.map((event) => event.id)).toEqual(["audit_a", "audit_b"]);
+    expect(repos.audit.listForLead(lead.id).map((event) => event.id)).toEqual(["audit_b", "audit_a"]);
+    expect(repos.leads.getLeadDetail(lead.id).auditEvents.map((event) => event.id)).toEqual(["audit_b", "audit_a"]);
   });
 });
