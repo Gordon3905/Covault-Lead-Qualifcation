@@ -60,7 +60,7 @@ export function createRuleRepository(db) {
       return db.prepare(`
         SELECT * FROM scoring_rules
         WHERE scoring_rule_version_id = ?
-        ORDER BY created_at, id
+        ORDER BY rowid
       `).all(versionId).map(mapScoringRule);
     },
 

@@ -5,14 +5,15 @@ export function createMockAiAdapter() {
 
     async assessLead({ lead, scoreResult }) {
       const leadName = lead.name ?? lead.companyName ?? "This lead";
-      const topMatch = scoreResult.matchedRules?.[0]?.label ?? "the configured fit criteria";
+      const topMatch = scoreResult.matchedRules?.[0];
       const firstMiss = scoreResult.missedCriteria?.[0]?.label;
-      const missText = firstMiss ? ` The main gap is ${firstMiss.toLowerCase()}.` : "";
+      const matchText = topMatch ? ` Strongest fit signal: ${topMatch.label} (+${topMatch.points}).` : "";
+      const missText = firstMiss ? ` Main gap to resolve: ${firstMiss}.` : "";
 
       return {
         providerKey: "ai",
         mode: "mock",
-        explanation: `${leadName} is ${scoreResult.tier} with a score of ${scoreResult.finalScore} because ${topMatch.toLowerCase()} matched.${missText}`
+        explanation: `${leadName} is a ${scoreResult.tier} lead with a score of ${scoreResult.finalScore}.${matchText}${missText}`
       };
     }
   };
