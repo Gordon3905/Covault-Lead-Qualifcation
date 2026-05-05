@@ -31,7 +31,7 @@ export function createAuditRepository(db) {
       return db.prepare(`
         SELECT * FROM audit_events
         WHERE lead_id = ?
-        ORDER BY created_at ASC
+        ORDER BY created_at ASC, id ASC
       `).all(leadId).map(mapAuditEvent);
     },
 

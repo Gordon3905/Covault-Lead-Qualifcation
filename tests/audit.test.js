@@ -59,4 +59,23 @@ describe("audit repository", () => {
       details: { sequence: "Cold lead nurture" }
     });
   });
+
+  it("orders lead audit events by timestamp and id for stable timelines", () => {
+    const db = createTestDatabase();
+    const repos = createRepositories(db);
+    const client = repos.clients.create({ name: "Demo Medical", slug: "medical-practice" });
+    const lead = repos.leads.createLead({ clientId: client.id, source: "mock", payload: { industry: "medical_practice" } });
+
+    db.prepare(`
+      INSERT INTO audit_events (
+        id, lead_id, client_id, event_type, actor, details_json, created_at
+      )
+      VALUES
+        ('audit_b', @leadId, @clientId, 'second_same_time', 'test', '{}', '2026-05-05T20:00:00.000Z'),
+        ('audit_a', @leadId, @clientId, 'first_same_time', 'test', '{}', '2026-05-05T20:00:00.000Z')
+    `).run({ leadId: lead.id, clientId: client.id });
+
+    expect(repos.audit.listForLead(lead.id).map((event) => event.id)).toEqual(["audit_a", "audit_b"]);
+    expect(repos.leads.getLeadDetail(lead.id).auditEvents.map((event) => event.id)).toEqual(["audit_a", "audit_b"]);
+  });
 });
