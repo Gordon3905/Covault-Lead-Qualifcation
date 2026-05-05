@@ -23,10 +23,36 @@ export function createLeadRepository(db) {
 
     listLeads(clientId) {
       return db.prepare(`
-        SELECT * FROM leads
-        WHERE client_id = ?
-        ORDER BY created_at DESC
-      `).all(clientId).map(mapLead);
+        SELECT
+          leads.*,
+          scoring_results.id AS scoring_id,
+          scoring_results.scoring_rule_version_id,
+          scoring_results.final_score,
+          scoring_results.tier,
+          scoring_results.breakdown_json,
+          scoring_results.matched_rules_json,
+          scoring_results.missed_criteria_json,
+          scoring_results.created_at AS scoring_created_at
+        FROM leads
+        LEFT JOIN scoring_results ON scoring_results.lead_id = leads.id
+        WHERE leads.client_id = ?
+        ORDER BY leads.created_at DESC
+      `).all(clientId).map((row) => ({
+        ...mapLead(row),
+        scoring: row.scoring_id
+          ? mapScoringResult({
+              id: row.scoring_id,
+              lead_id: row.id,
+              scoring_rule_version_id: row.scoring_rule_version_id,
+              final_score: row.final_score,
+              tier: row.tier,
+              breakdown_json: row.breakdown_json,
+              matched_rules_json: row.matched_rules_json,
+              missed_criteria_json: row.missed_criteria_json,
+              created_at: row.scoring_created_at
+            })
+          : null
+      }));
     },
 
     saveScoringResult(input) {

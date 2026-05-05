@@ -48,6 +48,7 @@ describe("API", () => {
 
     const list = await request(app).get("/api/leads?clientSlug=pipeline-medical").expect(200);
     expect(list.body.leads).toHaveLength(1);
+    expect(list.body.leads[0].scoring).toMatchObject({ finalScore: 90, tier: "qualified" });
 
     const detail = await request(app).get(`/api/leads/${created.body.lead.id}`).expect(200);
     expect(detail.body.lead.scoring.finalScore).toBe(90);
