@@ -17,14 +17,24 @@ export async function generateLeadExplanation({ lead, scoreResult, aiEnabled, ai
 
 function deterministicExplanation({ lead, scoreResult, enabled }) {
   const leadName = lead.name ?? lead.companyName ?? "This lead";
-  const matched = scoreResult.matchedRules?.[0]?.label;
-  const missed = scoreResult.missedCriteria?.[0]?.label;
-  const matchText = matched ? ` It matched ${matched}.` : "";
-  const missText = missed ? ` The first gap is ${missed}.` : "";
+  const matched = scoreResult.matchedRules?.[0];
+  const missed = scoreResult.missedCriteria?.[0];
+  const matchText = matched ? ` Strongest fit signal: ${matched.label} (+${matched.points}).` : "";
+  const missText = missed ? ` Main gap to resolve: ${formatMissedCriterion(missed)}.` : "";
 
   return {
-    explanation: `${leadName} is ${scoreResult.tier} with a score of ${scoreResult.finalScore}.${matchText}${missText}`,
+    explanation: `${leadName} is a ${scoreResult.tier} lead with a score of ${scoreResult.finalScore}.${matchText}${missText}`,
     fallbackUsed: true,
     enabled
   };
+}
+
+function formatMissedCriterion(missed) {
+  const expected = formatValue(missed.expected);
+  const actual = missed.actual === null || missed.actual === undefined ? "no value" : formatValue(missed.actual);
+  return `${missed.label} expected ${expected} but received ${actual}`;
+}
+
+function formatValue(value) {
+  return Array.isArray(value) ? value.join(" or ") : String(value);
 }

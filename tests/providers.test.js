@@ -61,8 +61,21 @@ describe("generateLeadExplanation", () => {
 
     expect(result.fallbackUsed).toBe(true);
     expect(result.enabled).toBe(false);
-    expect(result.explanation).toContain("Cold Plumbing is nurture");
-    expect(result.explanation).toContain("Budget fit");
+    expect(result.explanation).toContain("Cold Plumbing is a nurture lead with a score of 82");
+    expect(result.explanation).toContain("Strongest fit signal: Budget fit");
+    expect(result.explanation).toContain("Main gap to resolve: Location fit");
+  });
+
+  it("creates useful deterministic context for a qualified lead", async () => {
+    const result = await generateLeadExplanation({
+      lead: { name: "Parker Medical" },
+      scoreResult: scoreResult(),
+      aiEnabled: false
+    });
+
+    expect(result.explanation).toBe(
+      "Parker Medical is a qualified lead with a score of 82. Strongest fit signal: Budget fit (+25). Main gap to resolve: Location fit expected Florida but received Ohio."
+    );
   });
 
   it("falls back to deterministic explanation when AI adapter fails", async () => {
@@ -79,7 +92,7 @@ describe("generateLeadExplanation", () => {
 
     expect(result.fallbackUsed).toBe(true);
     expect(result.enabled).toBe(true);
-    expect(result.explanation).toContain("Borderline Realty is review");
+    expect(result.explanation).toContain("Borderline Realty is a review lead");
   });
 });
 
