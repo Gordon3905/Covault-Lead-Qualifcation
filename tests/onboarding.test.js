@@ -50,6 +50,30 @@ describe("self-serve onboarding", () => {
     expect(email.body).toContain(response.body.dashboardUrl);
   });
 
+  it("seeds visible demo leads and returns a dashboard URL for a new signup", async () => {
+    const db = createTestDatabase();
+    const repos = createRepositories(db);
+    const app = createApp({ db, repos });
+
+    const response = await request(app)
+      .post("/api/onboarding/signup")
+      .send({
+        vertical: "medical-practice",
+        email: "owner@freshspa.example",
+        companyName: "Fresh Spa"
+      })
+      .expect(201);
+
+    expect(response.body.dashboardUrl).toBe("http://127.0.0.1:5173/?clientSlug=fresh-spa");
+    expect(response.body.credentials).toMatchObject({
+      email: "owner@freshspa.example"
+    });
+
+    const leads = await request(app).get("/api/leads?clientSlug=fresh-spa").expect(200);
+    expect(leads.body.leads).toHaveLength(3);
+    expect(leads.body.leads[0].scoring).toEqual(expect.objectContaining({ tier: expect.any(String) }));
+  });
+
   it("returns an existing workspace for duplicate signup emails without creating duplicate users", async () => {
     const db = createTestDatabase();
     const repos = createRepositories(db);

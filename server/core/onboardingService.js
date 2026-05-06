@@ -1,8 +1,9 @@
 import { createHash, randomBytes } from "node:crypto";
 import { demoVerticals } from "../db/seedData.js";
 import { createClientFromVertical } from "../db/seed.js";
+import { processLead } from "./leadPipeline.js";
 
-export function onboardCustomer({ db, repos, verticalSlug, email, companyName }) {
+export async function onboardCustomer({ db, repos, verticalSlug, email, companyName }) {
   const vertical = demoVerticals.find((candidate) => candidate.slug === verticalSlug);
   if (!vertical) {
     throw new Error(`Unsupported onboarding vertical: ${verticalSlug}`);
@@ -21,6 +22,15 @@ export function onboardCustomer({ db, repos, verticalSlug, email, companyName })
 
   const slug = uniqueClientSlug(repos, cleanCompanyName);
   const { client } = createClientFromVertical({ db, repos, vertical, companyName: cleanCompanyName, slug });
+  for (const sampleLead of vertical.sampleLeads) {
+    await processLead({
+      clientSlug: client.slug,
+      source: sampleLead.sourceQuality,
+      payload: sampleLead,
+      repos
+    });
+  }
+
   const password = generatePassword();
   const dashboardUrl = dashboardUrlFor(client.slug);
   const user = repos.onboarding.createUser({

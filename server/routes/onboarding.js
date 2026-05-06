@@ -4,16 +4,20 @@ import { onboardCustomer } from "../core/onboardingService.js";
 export function createOnboardingRouter({ db, repos }) {
   const router = express.Router();
 
-  router.post("/signup", (request, response) => {
-    const result = onboardCustomer({
-      db,
-      repos,
-      verticalSlug: request.body.vertical,
-      email: request.body.email,
-      companyName: request.body.companyName
-    });
+  router.post("/signup", async (request, response, next) => {
+    try {
+      const result = await onboardCustomer({
+        db,
+        repos,
+        verticalSlug: request.body.vertical,
+        email: request.body.email,
+        companyName: request.body.companyName
+      });
 
-    response.status(result.created ? 201 : 200).json(result);
+      response.status(result.created ? 201 : 200).json(result);
+    } catch (error) {
+      next(error);
+    }
   });
 
   return router;
