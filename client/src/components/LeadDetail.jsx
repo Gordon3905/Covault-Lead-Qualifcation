@@ -22,9 +22,9 @@ export function LeadDetail({ lead }) {
       </div>
 
       <div className="outcome-card">
-        <span>CoVault decision</span>
+        <span>Kavor decision</span>
         <strong>{action}</strong>
-        <p>{lead.route?.reason ?? "This lead is not sales-ready yet, so CoVault puts it into nurture automatically."}</p>
+        <p>{lead.route?.reason ?? "This lead is not sales-ready yet, so Kavor puts it into nurture automatically."}</p>
       </div>
 
       <div className="simple-steps">

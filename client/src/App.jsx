@@ -127,7 +127,7 @@ export default function App() {
     <main className="app-shell">
       <header className="topbar">
         <div>
-          <h1>CoVault Lead System</h1>
+          <h1>Kavor Leads</h1>
           <p>See who is ready for sales and where they go next.</p>
         </div>
         <label className="client-switcher">
@@ -147,7 +147,7 @@ export default function App() {
       <section className="demo-hero">
         <div>
           <span className="eyebrow">Live product demo</span>
-          <h2>Drop in a lead. CoVault decides what happens next.</h2>
+          <h2>Drop in a lead. Kavor decides what happens next.</h2>
           <p>
             A new prospect comes in, gets scored, gets explained in plain English, and is sent to the right rep or nurture path.
           </p>

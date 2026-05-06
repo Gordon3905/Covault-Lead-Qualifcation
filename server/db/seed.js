@@ -145,5 +145,5 @@ function slugify(value) {
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   await seedDemoData();
-  console.log("Seeded CoVault demo data for real estate, plumbing, law firm, and medical practice.");
+  console.log("Seeded Kavor Leads demo data for real estate, plumbing, law firm, and medical practice.");
 }

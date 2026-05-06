@@ -17,7 +17,7 @@ export function createApp({ db, repos } = {}) {
   app.use(express.json());
 
   app.get("/api/health", (_request, response) => {
-    response.json({ ok: true, service: "covault-lead-qualification" });
+    response.json({ ok: true, service: "kavor-automation-system" });
   });
 
   app.use("/api/leads", createLeadRouter(appRepos));

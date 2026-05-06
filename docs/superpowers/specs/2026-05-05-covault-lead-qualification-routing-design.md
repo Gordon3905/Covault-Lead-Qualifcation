@@ -1,8 +1,8 @@
-# CoVault Lead Qualification and Routing Design
+# Kavor Automation System Lead Qualification and Routing Design
 
 ## Summary
 
-CoVault Lead Qualification and Routing is a modular full-stack JavaScript demo product that ingests leads from multiple sources, scores them with client-configurable weighted rules, optionally explains the score in natural language, routes qualified prospects to sales teams, and sends cold leads into nurture sequences.
+Kavor Automation System Lead Qualification and Routing is a modular full-stack JavaScript demo product that ingests leads from multiple sources, scores them with client-configurable weighted rules, optionally explains the score in natural language, routes qualified prospects to sales teams, and sends cold leads into nurture sequences.
 
 The first version is a working local demo with real architecture boundaries: Node/Express API, React dashboard, SQLite persistence, and provider adapters that can run in `mock` or `live` mode independently. The core scoring and routing pipeline stays pure application logic so any single provider can move from mock to live without changing lead scoring, rule evaluation, routing, audit logging, or dashboard behavior.
 
@@ -292,3 +292,4 @@ Automated tests cover:
 - Every lead has a clear audit trail covering scoring, routing, adapter calls, and delivery outcomes.
 - Rule edits affect new leads only and preserve historical scores and routes.
 - Demo data covers real estate, plumbing, law firm, and medical practice verticals.
+

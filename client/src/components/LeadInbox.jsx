@@ -6,7 +6,7 @@ export function LeadInbox({ leads, selectedLeadId, onSelectLead, tierFilter, onT
       <div className="panel-header">
         <div>
           <h2>Incoming leads</h2>
-          <p>Click one to see what CoVault did with it.</p>
+          <p>Click one to see what Kavor did with it.</p>
         </div>
         <select value={tierFilter} onChange={(event) => onTierFilterChange(event.target.value)} aria-label="Filter by tier">
           <option value="all">All leads</option>

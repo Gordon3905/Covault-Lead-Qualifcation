@@ -9,7 +9,7 @@ describe("lead demo dashboard source", () => {
     expect(app).toContain("DemoSimulator");
     expect(app).toContain("LeadInbox");
     expect(app).toContain("LeadDetail");
-    expect(app).toContain("Drop in a lead. CoVault decides what happens next.");
+    expect(app).toContain("Drop in a lead. Kavor decides what happens next.");
     expect(app).toContain("Ready for sales");
     expect(app).toContain("Sent to nurture");
     expect(app).toContain("SignupFlow");

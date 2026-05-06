@@ -1,8 +1,8 @@
-# CoVault Lead Qualification and Routing Implementation Plan
+# Kavor Automation System Lead Qualification and Routing Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Build a working local full-stack CoVault demo that ingests, scores, explains, routes, audits, and nurtures leads through mock/live-ready provider adapters.
+**Goal:** Build a working local full-stack Kavor Leads demo that ingests, scores, explains, routes, audits, and nurtures leads through mock/live-ready provider adapters.
 
 **Architecture:** Use a React dashboard, Node/Express API, SQLite repository layer, and pure core pipeline modules. Provider adapters are resolved by persisted per-provider mode so any one adapter can switch from mock to live without changing scoring, routing, audit, or dashboard logic.
 
@@ -52,7 +52,7 @@ Add `package.json`:
 
 ```json
 {
-  "name": "covault-lead-qualification-routing",
+  "name": "kavor-leads-routing",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -100,7 +100,7 @@ Add `.env.example`:
 
 ```bash
 PORT=4300
-DATABASE_PATH=data/covault.sqlite
+DATABASE_PATH=data/kavor-leads.sqlite
 DEFAULT_CLIENT_SLUG=real-estate
 ```
 
@@ -145,7 +145,7 @@ Add `client/src/App.jsx`:
 
 ```jsx
 export default function App() {
-  return <main className="app-shell">CoVault Lead Qualification</main>;
+  return <main className="app-shell">Kavor Leads</main>;
 }
 ```
 
@@ -159,7 +159,7 @@ const port = Number(process.env.PORT || 4300);
 const app = createApp();
 
 app.listen(port, () => {
-  console.log(`CoVault API listening on http://127.0.0.1:${port}`);
+  console.log(`Kavor Automation System API listening on http://127.0.0.1:${port}`);
 });
 ```
 
@@ -175,7 +175,7 @@ Run:
 
 ```bash
 git add package.json package-lock.json .gitignore .env.example index.html vite.config.js client server
-git commit -m "chore: scaffold CoVault lead routing app"
+git commit -m "chore: scaffold Kavor Leads routing app"
 ```
 
 ## Task 2: Database Schema and Repositories
@@ -254,7 +254,7 @@ import { mkdirSync } from "node:fs";
 import { dirname } from "node:path";
 import { applySchema } from "./schema.js";
 
-export function createDatabase(path = process.env.DATABASE_PATH || "data/covault.sqlite") {
+export function createDatabase(path = process.env.DATABASE_PATH || "data/kavor-leads.sqlite") {
   mkdirSync(dirname(path), { recursive: true });
   const db = new Database(path);
   applySchema(db);
@@ -579,7 +579,7 @@ Commit:
 
 ```bash
 git add client tests/ui-build.test.js
-git commit -m "feat: add CoVault operations dashboard"
+git commit -m "feat: add Kavor Leads dashboard"
 ```
 
 ## Task 9: Final Verification and README
@@ -619,7 +619,7 @@ Expected: all commands complete successfully.
 
 ```bash
 git add README.md .env.example
-git commit -m "docs: add CoVault demo guide"
+git commit -m "docs: add Kavor Leads demo guide"
 ```
 
 ## Self-Review
@@ -627,3 +627,5 @@ git commit -m "docs: add CoVault demo guide"
 - Spec coverage: This plan covers full-stack scaffold, SQLite persistence, provider adapters, deterministic scoring, optional AI explanation, territory and round-robin routing, audit logs, rule versioning, multi-vertical seed data, dashboard, API contracts, and README.
 - Red-flag scan: No incomplete markers or intentionally vague implementation slots remain. The plan includes exact file paths, commands, expected outcomes, and concrete function boundaries.
 - Type consistency: Core entities consistently use `clientId`, `leadId`, `scoringRuleVersionId`, `territoryRuleVersionId`, `providerKey`, `mode`, `finalScore`, `tier`, and JSON-compatible structured details.
+
+

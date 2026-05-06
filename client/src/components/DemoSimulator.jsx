@@ -44,7 +44,7 @@ export function DemoSimulator({ clientSlug, isRunning, onRunDemo }) {
     <section className="simulator-panel">
       <div>
         <h3>Test it now</h3>
-        <p>Create a fresh high-intent lead and watch CoVault handle it.</p>
+        <p>Create a fresh high-intent lead and watch Kavor handle it.</p>
       </div>
       <dl>
         <div>

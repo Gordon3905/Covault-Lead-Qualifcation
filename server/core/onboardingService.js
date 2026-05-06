@@ -27,9 +27,9 @@ export function onboardCustomer({ db, repos, verticalSlug, email, companyName })
   repos.onboarding.createEmailDelivery({
     clientId: client.id,
     recipientEmail: normalizedEmail,
-    subject: "Your CoVault dashboard is ready",
+    subject: "Your Kavor Leads dashboard is ready",
     body: [
-      `Welcome to CoVault, ${cleanCompanyName}.`,
+      `Welcome to Kavor Automation System, ${cleanCompanyName}.`,
       `Dashboard: ${dashboardUrl}`,
       `Email: ${normalizedEmail}`,
       `Password: ${password}`
@@ -80,7 +80,7 @@ function slugify(value) {
 }
 
 function generatePassword() {
-  return `CoVault-${randomBytes(4).toString("hex")}`;
+  return `Kavor-${randomBytes(4).toString("hex")}`;
 }
 
 function hashPassword(password) {
