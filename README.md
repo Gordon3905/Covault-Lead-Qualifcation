@@ -1,6 +1,6 @@
-# CoVault Lead Qualification and Routing
+# Kas Leads
 
-CoVault is a full-stack JavaScript demo app for lead intake, qualification, routing, and nurture automation. It ingests incoming leads, scores them with client-configurable weighted rules, generates a short explanation, routes qualified prospects to sales reps, and sends cold leads into nurture.
+Kas is a full-stack JavaScript demo app for lead intake, qualification, routing, and nurture automation. It ingests incoming leads, scores them with client-configurable weighted rules, generates a short explanation, routes qualified prospects to sales reps, and sends cold leads into nurture.
 
 The demo is built to behave like a real product: SQLite persistence, versioned scoring and territory rules, provider adapter mode toggles, round-robin cursor persistence, and a full audit trail for every processed lead.
 
