@@ -21,6 +21,11 @@ export function createClientRepository(db) {
     findBySlug(slug) {
       const row = db.prepare("SELECT * FROM clients WHERE slug = ?").get(slug);
       return row ? mapClient(row) : null;
+    },
+
+    findById(id) {
+      const row = db.prepare("SELECT * FROM clients WHERE id = ?").get(id);
+      return row ? mapClient(row) : null;
     }
   };
 }

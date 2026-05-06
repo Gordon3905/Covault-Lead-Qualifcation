@@ -14,6 +14,11 @@ export function onboardCustomer({ db, repos, verticalSlug, email, companyName })
     throw new Error("Company name and email are required");
   }
 
+  const existingUser = repos.onboarding.findUserByEmail(normalizedEmail);
+  if (existingUser) {
+    return refreshExistingSignup({ repos, user: existingUser, email: normalizedEmail });
+  }
+
   const slug = uniqueClientSlug(repos, cleanCompanyName);
   const { client } = createClientFromVertical({ db, repos, vertical, companyName: cleanCompanyName, slug });
   const password = generatePassword();
@@ -49,10 +54,58 @@ export function onboardCustomer({ db, repos, verticalSlug, email, companyName })
   });
 
   return {
+    created: true,
     client,
     dashboardUrl,
     credentials: {
       email: normalizedEmail,
+      password
+    }
+  };
+}
+
+function refreshExistingSignup({ repos, user, email }) {
+  const client = repos.clients.findById(user.clientId);
+  if (!client) {
+    throw new Error("Existing signup has no client workspace");
+  }
+
+  const password = generatePassword();
+  repos.onboarding.updateUserPassword({
+    userId: user.id,
+    passwordHash: hashPassword(password)
+  });
+
+  const dashboardUrl = dashboardUrlFor(client.slug);
+  repos.onboarding.createEmailDelivery({
+    clientId: client.id,
+    recipientEmail: email,
+    subject: "Your Kavor Leads dashboard is ready",
+    body: [
+      `Welcome back to Kavor Automation System, ${client.name}.`,
+      `Dashboard: ${dashboardUrl}`,
+      `Email: ${email}`,
+      `Password: ${password}`
+    ].join("\n")
+  });
+
+  repos.audit.record({
+    clientId: client.id,
+    eventType: "onboarding.existing_user_returned",
+    actor: "system",
+    details: {
+      email,
+      dashboardUrl,
+      userId: user.id
+    }
+  });
+
+  return {
+    created: false,
+    client,
+    dashboardUrl,
+    credentials: {
+      email,
       password
     }
   };

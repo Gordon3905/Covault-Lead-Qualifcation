@@ -13,7 +13,7 @@ export function createOnboardingRouter({ db, repos }) {
       companyName: request.body.companyName
     });
 
-    response.status(201).json(result);
+    response.status(result.created ? 201 : 200).json(result);
   });
 
   return router;

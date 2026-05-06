@@ -2,6 +2,11 @@ import { createId, nowIso } from "./utils.js";
 
 export function createOnboardingRepository(db) {
   return {
+    findUserByEmail(email) {
+      const row = db.prepare("SELECT * FROM customer_users WHERE email = ?").get(email);
+      return row ? mapUser(row) : null;
+    },
+
     createUser(input) {
       const user = {
         id: input.id ?? createId("user"),
@@ -18,6 +23,12 @@ export function createOnboardingRepository(db) {
       `).run(user);
 
       return user;
+    },
+
+    updateUserPassword(input) {
+      db.prepare("UPDATE customer_users SET password_hash = ? WHERE id = ?").run(input.passwordHash, input.userId);
+      const row = db.prepare("SELECT * FROM customer_users WHERE id = ?").get(input.userId);
+      return row ? mapUser(row) : null;
     },
 
     createEmailDelivery(input) {
@@ -44,5 +55,16 @@ export function createOnboardingRepository(db) {
 
       return delivery;
     }
+  };
+}
+
+function mapUser(row) {
+  return {
+    id: row.id,
+    clientId: row.client_id,
+    email: row.email,
+    passwordHash: row.password_hash,
+    role: row.role,
+    createdAt: row.created_at
   };
 }

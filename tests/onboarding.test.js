@@ -49,4 +49,33 @@ describe("self-serve onboarding", () => {
     expect(email.body).toContain(response.body.credentials.password);
     expect(email.body).toContain(response.body.dashboardUrl);
   });
+
+  it("returns an existing workspace for duplicate signup emails without creating duplicate users", async () => {
+    const db = createTestDatabase();
+    const repos = createRepositories(db);
+    const app = createApp({ db, repos });
+    const signup = {
+      vertical: "medical-practice",
+      email: "owner@glow.example",
+      companyName: "Glow House Med Spa"
+    };
+
+    const first = await request(app).post("/api/onboarding/signup").send(signup).expect(201);
+    const second = await request(app).post("/api/onboarding/signup").send(signup).expect(200);
+
+    expect(second.body.client.slug).toBe(first.body.client.slug);
+    expect(second.body.dashboardUrl).toBe(first.body.dashboardUrl);
+    expect(second.body.credentials.password).toMatch(/^Kavor-/);
+
+    const users = db.prepare("SELECT * FROM customer_users WHERE email = ?").all("owner@glow.example");
+    expect(users).toHaveLength(1);
+    expect(users[0].password_hash).not.toBe(first.body.credentials.password);
+    expect(users[0].password_hash).not.toBe(second.body.credentials.password);
+
+    const matchingIndexes = db
+      .prepare("PRAGMA index_list('customer_users')")
+      .all()
+      .filter((index) => index.unique === 1);
+    expect(matchingIndexes.length).toBeGreaterThanOrEqual(1);
+  });
 });
