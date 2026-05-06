@@ -2,73 +2,56 @@ export function LeadDetail({ lead }) {
   if (!lead) {
     return (
       <section className="panel lead-detail empty-state">
-        <h2>Lead Detail</h2>
-        <p>Select a lead to inspect score breakdown, routing, delivery, and audit history.</p>
+        <h2>What happened?</h2>
+        <p>Select a lead to see the decision, the assigned follow-up, and the reason.</p>
       </section>
     );
   }
 
   const assessment = lead.aiAssessments?.[0];
+  const action = lead.scoring?.tier === "qualified" ? "Send to sales now" : lead.scoring?.tier === "review" ? "Have a manager review" : "Start nurture";
 
   return (
     <section className="panel lead-detail">
       <div className="panel-header">
         <div>
           <h2>{lead.payload.name ?? "Unnamed lead"}</h2>
-          <p>{lead.payload.industry ?? "unknown"} / {lead.payload.region ?? "no region"}</p>
+          <p>{lead.payload.region ?? "No region"} · {money(lead.payload.budget)} budget · {lead.payload.urgency ?? "unknown"} intent</p>
         </div>
-        <span className={`tier-badge tier-${lead.scoring?.tier}`}>{lead.scoring?.tier ?? "new"}</span>
+        <span className={`tier-badge tier-${lead.scoring?.tier}`}>{tierLabel(lead.scoring?.tier)}</span>
       </div>
 
-      <div className="score-strip">
-        <div>
-          <span>Score</span>
-          <strong>{lead.scoring?.finalScore ?? "-"}</strong>
-        </div>
-        <div>
-          <span>Route</span>
-          <strong>{lead.route ? lead.route.strategy : "nurture"}</strong>
-        </div>
+      <div className="outcome-card">
+        <span>CoVault decision</span>
+        <strong>{action}</strong>
+        <p>{lead.route?.reason ?? "This lead is not sales-ready yet, so CoVault puts it into nurture automatically."}</p>
       </div>
 
-      <div className="detail-grid">
+      <div className="simple-steps">
         <article>
-          <h3>Score Breakdown</h3>
-          <ul className="clean-list">
-            {(lead.scoring?.matchedRules ?? []).map((rule) => (
-              <li key={rule.id}>
-                <span>{rule.label}</span>
-                <strong>+{rule.points}</strong>
-              </li>
-            ))}
-          </ul>
+          <span>1</span>
+          <strong>Lead captured</strong>
+          <p>{lead.source} · {formatTime(lead.createdAt)}</p>
         </article>
-
         <article>
-          <h3>Missed Criteria</h3>
-          <ul className="clean-list">
-            {(lead.scoring?.missedCriteria ?? []).slice(0, 4).map((item) => (
-              <li key={item.id}>
-                <span>{item.label}</span>
-                <strong>{String(item.actual ?? "none")}</strong>
-              </li>
-            ))}
-          </ul>
+          <span>2</span>
+          <strong>Fit checked</strong>
+          <p>{lead.scoring?.finalScore ?? "-"} score · {topRule(lead)}</p>
+        </article>
+        <article>
+          <span>3</span>
+          <strong>{lead.route ? "Routed to sales" : "Sent to nurture"}</strong>
+          <p>{lead.route ? "Territory and round-robin assignment complete." : "Automatic follow-up sequence started."}</p>
         </article>
       </div>
 
       <article className="explanation">
-        <h3>AI Assessment</h3>
+        <h3>Why this decision?</h3>
         <p>{assessment?.explanation ?? "No assessment yet."}</p>
       </article>
 
-      <article>
-        <h3>Route Decision</h3>
-        <p className="route-copy">{lead.route?.reason ?? "Cold lead entered nurture automatically."}</p>
-      </article>
-
-      <article>
-        <h3>Audit Timeline</h3>
+      <details className="technical-details">
+        <summary>Manager proof log</summary>
         <ol className="timeline">
           {(lead.auditEvents ?? []).map((event) => (
             <li key={event.id}>
@@ -78,9 +61,28 @@ export function LeadDetail({ lead }) {
             </li>
           ))}
         </ol>
-      </article>
+      </details>
     </section>
   );
+}
+
+function tierLabel(tier) {
+  if (tier === "qualified") return "Ready for sales";
+  if (tier === "review") return "Needs review";
+  if (tier === "nurture") return "Nurture";
+  return "New";
+}
+
+function topRule(lead) {
+  return lead.scoring?.matchedRules?.[0]?.label ?? "No strong fit yet";
+}
+
+function money(value) {
+  if (!Number.isFinite(Number(value))) {
+    return "Unknown";
+  }
+
+  return `$${Number(value).toLocaleString()}`;
 }
 
 function formatTime(value) {

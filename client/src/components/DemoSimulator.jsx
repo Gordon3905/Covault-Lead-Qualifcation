@@ -41,10 +41,10 @@ export function DemoSimulator({ clientSlug, isRunning, onRunDemo }) {
   const payload = demoLeadTemplates[clientSlug] ?? demoLeadTemplates["real-estate"];
 
   return (
-    <section className="panel simulator-panel">
+    <section className="simulator-panel">
       <div>
-        <h2>Demo Simulator</h2>
-        <p>Inject a fresh high-intent lead through the live pipeline.</p>
+        <h3>Test it now</h3>
+        <p>Create a fresh high-intent lead and watch CoVault handle it.</p>
       </div>
       <dl>
         <div>
@@ -57,7 +57,7 @@ export function DemoSimulator({ clientSlug, isRunning, onRunDemo }) {
         </div>
       </dl>
       <button type="button" onClick={() => onRunDemo(payload)} disabled={isRunning}>
-        {isRunning ? "Processing..." : "Run Live Demo Lead"}
+        {isRunning ? "Processing lead..." : "Send a new lead through"}
       </button>
     </section>
   );

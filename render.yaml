@@ -2,8 +2,9 @@ services:
   - type: web
     name: covault-lead-qualification-api
     env: node
-    plan: free
+    plan: starter
     buildCommand: npm install
+    preDeployCommand: npm run db:seed
     startCommand: npm start
     healthCheckPath: /api/health
     envVars:

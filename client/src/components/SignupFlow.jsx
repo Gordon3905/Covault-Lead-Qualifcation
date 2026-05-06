@@ -27,8 +27,8 @@ export function SignupFlow({ isSubmitting, result, onSignup }) {
     <section className="panel signup-panel">
       <div className="panel-header">
         <div>
-          <h2>Self-Serve Signup</h2>
-          <p>Create a configured client workspace</p>
+          <h2>Want to show onboarding?</h2>
+          <p>Create a ready-to-use test customer in one step.</p>
         </div>
       </div>
 
@@ -66,13 +66,13 @@ export function SignupFlow({ isSubmitting, result, onSignup }) {
         </label>
 
         <button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? "Creating..." : "Create account"}
+          {isSubmitting ? "Creating..." : "Create test customer"}
         </button>
       </form>
 
       {result ? (
         <div className="credential-box">
-          <span>Generated login</span>
+          <span>Test login created</span>
           <strong>{result.credentials.email}</strong>
           <code>{result.credentials.password}</code>
           <a href={result.dashboardUrl}>Open dashboard</a>

@@ -5,50 +5,51 @@ export function LeadInbox({ leads, selectedLeadId, onSelectLead, tierFilter, onT
     <section className="panel lead-inbox">
       <div className="panel-header">
         <div>
-          <h2>Lead Inbox</h2>
-          <p>{filteredLeads.length} visible leads</p>
+          <h2>Incoming leads</h2>
+          <p>Click one to see what CoVault did with it.</p>
         </div>
         <select value={tierFilter} onChange={(event) => onTierFilterChange(event.target.value)} aria-label="Filter by tier">
-          <option value="all">All tiers</option>
-          <option value="qualified">Qualified</option>
-          <option value="review">Review</option>
+          <option value="all">All leads</option>
+          <option value="qualified">Ready for sales</option>
+          <option value="review">Needs review</option>
           <option value="nurture">Nurture</option>
         </select>
       </div>
 
-      <div className="table-shell">
-        <table>
-          <thead>
-            <tr>
-              <th>Lead</th>
-              <th>Source</th>
-              <th>Status</th>
-              <th>Created</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredLeads.map((lead) => (
-              <tr
-                key={lead.id}
-                className={lead.id === selectedLeadId ? "selected-row" : ""}
-                onClick={() => onSelectLead(lead.id)}
-              >
-                <td>
-                  <strong>{lead.payload.name ?? lead.payload.companyName ?? "Unnamed lead"}</strong>
-                  <span>{lead.payload.industry ?? "unknown industry"}</span>
-                </td>
-                <td>{lead.source}</td>
-                <td>
-                  <span className="status-badge">{lead.scoring?.tier ?? lead.status}</span>
-                </td>
-                <td>{formatDate(lead.createdAt)}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <div className="lead-list">
+        {filteredLeads.map((lead) => (
+          <button
+            type="button"
+            key={lead.id}
+            className={`lead-card ${lead.id === selectedLeadId ? "selected-row" : ""}`}
+            onClick={() => onSelectLead(lead.id)}
+          >
+            <span className={`tier-badge tier-${lead.scoring?.tier}`}>{tierLabel(lead.scoring?.tier)}</span>
+            <strong>{lead.payload.name ?? lead.payload.companyName ?? "Unnamed lead"}</strong>
+            <span>
+              {money(lead.payload.budget)} budget · {lead.payload.urgency ?? "unknown"} intent · {lead.payload.region ?? "no region"}
+            </span>
+            <em>{formatDate(lead.createdAt)}</em>
+          </button>
+        ))}
       </div>
     </section>
   );
+}
+
+function tierLabel(tier) {
+  if (tier === "qualified") return "Ready for sales";
+  if (tier === "review") return "Needs review";
+  if (tier === "nurture") return "Nurture";
+  return "New";
+}
+
+function money(value) {
+  if (!Number.isFinite(Number(value))) {
+    return "Unknown";
+  }
+
+  return `$${Number(value).toLocaleString()}`;
 }
 
 function formatDate(value) {

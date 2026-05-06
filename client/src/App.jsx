@@ -13,10 +13,7 @@ import {
 import { DemoSimulator } from "./components/DemoSimulator.jsx";
 import { LeadDetail } from "./components/LeadDetail.jsx";
 import { LeadInbox } from "./components/LeadInbox.jsx";
-import { ProviderSettings } from "./components/ProviderSettings.jsx";
-import { ScoringRules } from "./components/ScoringRules.jsx";
 import { SignupFlow } from "./components/SignupFlow.jsx";
-import { TerritoryRules } from "./components/TerritoryRules.jsx";
 
 const demoClients = [
   { slug: "real-estate", label: "Real Estate" },
@@ -43,6 +40,8 @@ export default function App() {
   const [error, setError] = useState("");
 
   const selectedClient = useMemo(() => clients.find((client) => client.slug === clientSlug), [clientSlug]);
+  const qualifiedCount = leads.filter((lead) => lead.scoring?.tier === "qualified").length;
+  const nurtureCount = leads.filter((lead) => lead.scoring?.tier === "nurture").length;
 
   useEffect(() => {
     refreshWorkspace(clientSlug);
@@ -128,11 +127,11 @@ export default function App() {
     <main className="app-shell">
       <header className="topbar">
         <div>
-          <h1>CoVault Lead Qualification</h1>
-          <p>Live intake, scoring, routing, and audit console</p>
+          <h1>CoVault Lead System</h1>
+          <p>See who is ready for sales and where they go next.</p>
         </div>
         <label className="client-switcher">
-          <span>Client</span>
+          <span>Demo type</span>
           <select value={clientSlug} onChange={(event) => setClientSlug(event.target.value)}>
             {clients.map((client) => (
               <option key={client.slug} value={client.slug}>
@@ -145,34 +144,37 @@ export default function App() {
 
       {error ? <div className="error-banner">{error}</div> : null}
 
+      <section className="demo-hero">
+        <div>
+          <span className="eyebrow">Live product demo</span>
+          <h2>Drop in a lead. CoVault decides what happens next.</h2>
+          <p>
+            A new prospect comes in, gets scored, gets explained in plain English, and is sent to the right rep or nurture path.
+          </p>
+        </div>
+        <DemoSimulator clientSlug={clientSlug} isRunning={isRunningDemo} onRunDemo={handleRunDemo} />
+      </section>
+
       <section className="workspace-summary">
         <div>
-          <span>Active vertical</span>
-          <strong>{selectedClient?.label}</strong>
-        </div>
-        <div>
-          <span>Leads</span>
+          <span>Total leads</span>
           <strong>{leads.length}</strong>
         </div>
         <div>
-          <span>Sales reps</span>
-          <strong>{reps.reps.length}</strong>
+          <span>Ready for sales</span>
+          <strong>{qualifiedCount}</strong>
         </div>
         <div>
-          <span>Provider modes</span>
-          <strong>{providers.filter((provider) => provider.mode === "mock").length} mock</strong>
+          <span>Sent to nurture</span>
+          <strong>{nurtureCount}</strong>
+        </div>
+        <div>
+          <span>Sales team</span>
+          <strong>{reps.reps.length} reps</strong>
         </div>
       </section>
 
       <div className="dashboard-grid">
-        <aside className="left-rail">
-          <SignupFlow isSubmitting={isSigningUp} result={signupResult} onSignup={handleSignup} />
-          <DemoSimulator clientSlug={clientSlug} isRunning={isRunningDemo} onRunDemo={handleRunDemo} />
-          <ProviderSettings providers={providers} onToggleMode={handleToggleProvider} />
-          <ScoringRules scoring={scoring} />
-          <TerritoryRules territories={territories} reps={reps} />
-        </aside>
-
         <LeadInbox
           leads={leads}
           selectedLeadId={selectedLeadId}
@@ -183,6 +185,8 @@ export default function App() {
 
         <LeadDetail lead={selectedLead} />
       </div>
+
+      <SignupFlow isSubmitting={isSigningUp} result={signupResult} onSignup={handleSignup} />
     </main>
   );
 }
