@@ -1,5 +1,11 @@
+const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL ?? "").replace(/\/$/, "");
+
+function apiUrl(path) {
+  return `${apiBaseUrl}${path}`;
+}
+
 async function request(path, options = {}) {
-  const response = await fetch(path, {
+  const response = await fetch(apiUrl(path), {
     headers: { "Content-Type": "application/json", ...(options.headers ?? {}) },
     ...options
   });
@@ -47,5 +53,12 @@ export function createDemoLead(clientSlug, payload) {
   return request("/api/demo/leads", {
     method: "POST",
     body: JSON.stringify({ clientSlug, payload })
+  });
+}
+
+export function signupCustomer(input) {
+  return request("/api/onboarding/signup", {
+    method: "POST",
+    body: JSON.stringify(input)
   });
 }

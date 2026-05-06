@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: covault-lead-qualification-api
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 4300
+      - key: DATABASE_PATH
+        value: /var/data/covault.sqlite
+      - key: DEFAULT_CLIENT_SLUG
+        value: real-estate
+      - key: ALLOWED_ORIGINS
+        sync: false
+      - key: DASHBOARD_BASE_URL
+        sync: false
+    disk:
+      name: covault-sqlite-data
+      mountPath: /var/data
+      sizeGB: 1

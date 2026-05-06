@@ -7,6 +7,7 @@ import {
   getReps,
   getScoring,
   getTerritories,
+  signupCustomer,
   updateProviderMode
 } from "./api.js";
 import { DemoSimulator } from "./components/DemoSimulator.jsx";
@@ -14,9 +15,10 @@ import { LeadDetail } from "./components/LeadDetail.jsx";
 import { LeadInbox } from "./components/LeadInbox.jsx";
 import { ProviderSettings } from "./components/ProviderSettings.jsx";
 import { ScoringRules } from "./components/ScoringRules.jsx";
+import { SignupFlow } from "./components/SignupFlow.jsx";
 import { TerritoryRules } from "./components/TerritoryRules.jsx";
 
-const clients = [
+const demoClients = [
   { slug: "real-estate", label: "Real Estate" },
   { slug: "plumbing", label: "Plumbing" },
   { slug: "law-firm", label: "Law Firm" },
@@ -24,7 +26,9 @@ const clients = [
 ];
 
 export default function App() {
-  const [clientSlug, setClientSlug] = useState("real-estate");
+  const initialClientSlug = new URLSearchParams(window.location.search).get("clientSlug") ?? "real-estate";
+  const [clients, setClients] = useState(demoClients);
+  const [clientSlug, setClientSlug] = useState(initialClientSlug);
   const [leads, setLeads] = useState([]);
   const [selectedLeadId, setSelectedLeadId] = useState(null);
   const [selectedLead, setSelectedLead] = useState(null);
@@ -34,6 +38,8 @@ export default function App() {
   const [reps, setReps] = useState({ teams: [], reps: [] });
   const [tierFilter, setTierFilter] = useState("all");
   const [isRunningDemo, setIsRunningDemo] = useState(false);
+  const [isSigningUp, setIsSigningUp] = useState(false);
+  const [signupResult, setSignupResult] = useState(null);
   const [error, setError] = useState("");
 
   const selectedClient = useMemo(() => clients.find((client) => client.slug === clientSlug), [clientSlug]);
@@ -81,6 +87,29 @@ export default function App() {
       setError(requestError.message);
     } finally {
       setIsRunningDemo(false);
+    }
+  }
+
+  async function handleSignup(input) {
+    setIsSigningUp(true);
+    setError("");
+    try {
+      const response = await signupCustomer(input);
+      setSignupResult(response);
+      setClients((current) => {
+        if (current.some((client) => client.slug === response.client.slug)) {
+          return current;
+        }
+
+        return [{ slug: response.client.slug, label: response.client.name }, ...current];
+      });
+      setClientSlug(response.client.slug);
+      await refreshWorkspace(response.client.slug);
+      window.history.replaceState(null, "", `?clientSlug=${encodeURIComponent(response.client.slug)}`);
+    } catch (requestError) {
+      setError(requestError.message);
+    } finally {
+      setIsSigningUp(false);
     }
   }
 
@@ -137,6 +166,7 @@ export default function App() {
 
       <div className="dashboard-grid">
         <aside className="left-rail">
+          <SignupFlow isSubmitting={isSigningUp} result={signupResult} onSignup={handleSignup} />
           <DemoSimulator clientSlug={clientSlug} isRunning={isRunningDemo} onRunDemo={handleRunDemo} />
           <ProviderSettings providers={providers} onToggleMode={handleToggleProvider} />
           <ScoringRules scoring={scoring} />

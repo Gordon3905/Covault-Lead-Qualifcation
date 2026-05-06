@@ -21,6 +21,8 @@ const demoTables = [
   "scoring_rule_versions",
   "reps",
   "teams",
+  "email_deliveries",
+  "customer_users",
   "provider_settings",
   "clients"
 ];
@@ -30,21 +32,7 @@ export async function seedDemoData(db = createDatabase()) {
   const repos = createRepositories(db);
 
   for (const vertical of demoVerticals) {
-    const client = repos.clients.create({ name: vertical.name, slug: vertical.slug });
-    const teams = vertical.teams.map((name) => repos.teams.createTeam({ clientId: client.id, name }));
-    vertical.reps.forEach((name, index) => {
-      repos.teams.createRep({
-        clientId: client.id,
-        teamId: teams[index % teams.length].id,
-        name,
-        email: `${slugify(name)}@${vertical.slug}.example`
-      });
-    });
-
-    createScoringConfig(repos, client, vertical);
-    createTerritoryConfig(repos, client, vertical, teams);
-    createProviderSettings(repos, client);
-    createNurtureSequence(db, client, vertical);
+    const { client } = createClientFromVertical({ db, repos, vertical, companyName: vertical.name, slug: vertical.slug });
 
     for (const sampleLead of vertical.sampleLeads) {
       await processLead({
@@ -55,6 +43,26 @@ export async function seedDemoData(db = createDatabase()) {
       });
     }
   }
+}
+
+export function createClientFromVertical({ db, repos, vertical, companyName, slug }) {
+  const client = repos.clients.create({ name: companyName, slug });
+  const teams = vertical.teams.map((name) => repos.teams.createTeam({ clientId: client.id, name }));
+  vertical.reps.forEach((name, index) => {
+    repos.teams.createRep({
+      clientId: client.id,
+      teamId: teams[index % teams.length].id,
+      name,
+      email: `${slugify(name)}@${slug}.example`
+    });
+  });
+
+  createScoringConfig(repos, client, vertical);
+  createTerritoryConfig(repos, client, vertical, teams);
+  createProviderSettings(repos, client);
+  createNurtureSequence(db, client, vertical, slug);
+
+  return { client, teams };
 }
 
 function resetDemoData(db) {
@@ -114,12 +122,12 @@ function createProviderSettings(repos, client) {
   repos.providers.upsert({ clientId: client.id, providerKey: "crm", category: "crm", mode: "mock", enabled: true });
 }
 
-function createNurtureSequence(db, client, vertical) {
+function createNurtureSequence(db, client, vertical, slug = vertical.slug) {
   db.prepare(`
     INSERT INTO nurture_sequences (id, client_id, name, trigger_tier, steps_json, active, created_at)
     VALUES (@id, @clientId, @name, 'nurture', @stepsJson, 1, @createdAt)
   `).run({
-    id: `nurture_${vertical.slug}`,
+    id: `nurture_${slug}`,
     clientId: client.id,
     name: vertical.nurture,
     stepsJson: JSON.stringify([
